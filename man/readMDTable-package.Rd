@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Functions for reading raw markdown tables from a string, file, or URL into tibbles. It includes options to warn users about potential issues with the markdown table format, ensuring robust data handling even if the table has minor formatting errors.
+Efficient reading of raw markdown tables into tibbles. Designed to accept content from strings, files, and URLs with the ability to extract and read multiple tables from markdown for analysis.
 }
 \seealso{
 Useful links:
