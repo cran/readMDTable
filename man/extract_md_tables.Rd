@@ -2,17 +2,17 @@
 % Please edit documentation in R/extract_md_tables.R
 \name{extract_md_tables}
 \alias{extract_md_tables}
+\alias{extract_md_table}
 \title{Extract Markdown Tables from Markdown Files}
 \usage{
-extract_md_tables(file, warn = TRUE, ...)
+extract_md_tables(file, ...)
+
+extract_md_table(file, ...)
 }
 \arguments{
 \item{file}{Either a path to a file, a connection, or literal data (either
 a single string or a raw vector). Files starting with \verb{http://},
 \verb{https://}, \verb{ftp://}, or \verb{ftps://} will be automatically downloaded.}
-
-\item{warn}{Boolean. Should warnings be raised about possible issues with
-the passed \code{file}? Defaults to \code{TRUE}.}
 
 \item{...}{
   Arguments passed on to \code{\link[readr:read_delim]{readr::read_delim}}
@@ -151,10 +151,8 @@ A tibble or list of tibbles.
 Extract Markdown Tables from Markdown Files
 }
 \details{
-\code{extract_md_tables} attempts to capture all the markdown
-tables from \code{file} utilizing a regular expression and therefore
-requires that the tables follow the markdown table format much
-more closely than \code{readMDTable::read_md_table}.
+\code{extract_md_tables} captures all the markdown tables
+from \code{file} and returns a tibble or list of tibbles
 }
 \examples{
 md <-

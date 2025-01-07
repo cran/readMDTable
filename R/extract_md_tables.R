@@ -1,9 +1,7 @@
 #' @title Extract Markdown Tables from Markdown Files
 #'
-#' @details `extract_md_tables` attempts to capture all the markdown
-#'   tables from `file` utilizing a regular expression and therefore
-#'   requires that the tables follow the markdown table format much
-#'   more closely than `readMDTable::read_md_table`.
+#' @details `extract_md_tables` captures all the markdown tables
+#'   from `file` and returns a tibble or list of tibbles
 #'
 #' @inheritParams read_md_table
 #' @inheritDotParams readr::read_delim -trim_ws -delim
@@ -63,21 +61,41 @@
 #' # Display the 2nd table in the list
 #' tables[[2]]
 #' @export
-extract_md_tables <- function(file, warn = TRUE, ...) {
+extract_md_tables <- function(file, ...) {
   content <- source_file(file) |>
     (\(x) stringr::str_split(x, "\n")[[1]])() |>
     sapply(trimws) |>
     paste(collapse = "\n")
 
-  # See https://stackoverflow.com/questions/9837935/regex-for-markdown-table-syntax
-  table_pattern <- "/|(?:([^\r\n|]*)\\|)+\r?\n\\|(?:(:?-+:?)\\|)+\r?\n(\\|(?:([^\r\n|]*)\\|)+\r?\n)+"
-  table_matches <- gregexpr(table_pattern, content, perl = TRUE)
-  tables <- regmatches(content, table_matches)[[1]]
-  tibbles <- lapply(tables, function(table) read_md_table_content(table, warn = warn, ...))
-
-  if (length(tibbles) == 1) {
-    return(tibbles[[1]])
+  tables <- match_md_tables(content)
+  if (is.null(tables)) {
+    cli::cli_abort(
+      c(
+        "x" = "Content in provided `file` does not match markdown table regex",
+        "i" = paste("If the content is indeed a markdown table, or close",
+                    "enough, try using `read_md_table`.")
+      )
+    )
   }
 
-  return(tibbles)
+  safe_read_md_table_content <- purrr::safely(
+    read_md_table_content,
+    quiet = TRUE
+  )
+
+  table_tibbles <- purrr::map(tables, function(table) {
+    table_tibble <- safe_read_md_table_content(table, ...)
+    return(table_tibble$result)
+  })
+
+  if (length(table_tibbles) == 1) {
+    return(table_tibbles[[1]])
+  }
+
+  return(table_tibbles)
 }
+
+
+#' @rdname extract_md_tables
+#' @export
+extract_md_table <- extract_md_tables
