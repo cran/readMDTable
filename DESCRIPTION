@@ -1,11 +1,12 @@
 Package: readMDTable
 Title: Read Markdown Tables into Tibbles
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: 
     person("Jordan", "Bradford", , "jrdnbradford@gmail.com", role = c("aut", "cre", "cph"))
 Description: Efficient reading of raw markdown tables into tibbles. Designed to
     accept content from strings, files, and URLs with the ability to extract
     and read multiple tables from markdown for analysis.
+Depends: R (>= 4.1.0)
 Imports: cli, httr2, readr, purrr, stringr
 URL: https://github.com/jrdnbradford/readMDTable,
         https://jrdnbradford.github.io/readMDTable/
@@ -18,8 +19,8 @@ Suggests: covr, devtools, ggplot2, knitr, lubridate, microbenchmark,
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2025-01-07 16:47:23 UTC; bradfojb
+Packaged: 2025-01-25 20:43:09 UTC; bradfojb
 Author: Jordan Bradford [aut, cre, cph]
 Maintainer: Jordan Bradford <jrdnbradford@gmail.com>
 Repository: CRAN
-Date/Publication: 2025-01-07 17:10:01 UTC
+Date/Publication: 2025-01-25 21:00:02 UTC
