@@ -1,3 +1,7 @@
+# readMDTable 0.3.2
+
+* Pre-compute `rvest-benchmarks` benchmark images (#98)
+
 # readMDTable 0.3.1
 
 * Add dependency on R (>= 4.1.0) (#92)
