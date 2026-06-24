@@ -1,15 +1,20 @@
 test_that("extract_md_tables can read a markdown table from file", {
   md_file <- test_path("testmd", "simple.md")
-  md_table <- extract_md_tables(md_file, show_col_types = FALSE)
-  expect_identical(test_tibble_1, md_table)
+  md_table <- suppressWarnings(extract_md_tables(md_file, show_col_types = FALSE))
+  expect_length(md_table, 1)
+  expect_true(inherits(md_table, "list"))
+  expect_named(md_table, "table_1")
+  expect_identical(test_tibble_1, md_table[[1]])
+  expect_identical(test_tibble_1, md_table[["table_1"]])
 })
 
 
 test_that("extract_md_tables can read multiple markdown tables from simple file", {
   md_file <- test_path("testmd", "simple-multiple-tables.md")
-  md_tables <- extract_md_tables(md_file, show_col_types = FALSE)
+  md_tables <- suppressWarnings(extract_md_tables(md_file, show_col_types = FALSE))
   expect_length(md_tables, 4)
   expect_true(inherits(md_tables, "list"))
+  expect_named(md_tables, paste0("table_", 1:4))
 
   table1 <- tibble::tribble(
     ~model,          ~mpg, ~cyl, ~disp, ~hp,  ~drat, ~wt,    ~qsec, ~vs, ~am, ~gear, ~carb,
@@ -68,11 +73,13 @@ test_that("extract_md_tables can read multiple markdown tables from simple file"
   expect_identical(table4, md_tables[[4]])
 })
 
+
 test_that("extract_md_tables can read multiple messy markdown tables from new file", {
   md_file <- test_path("testmd", "messy-multiple-tables.md")
-  md_tables <- extract_md_tables(md_file, show_col_types = FALSE)
+  md_tables <- suppressWarnings(extract_md_tables(md_file, show_col_types = FALSE))
   expect_length(md_tables, 4)
   expect_true(inherits(md_tables, "list"))
+  expect_named(md_tables, paste0("table_", 1:4))
 
   table1 <- tibble::tribble(
     ~model,           ~mpg, ~cyl, ~disp, ~hp,  ~drat, ~wt,    ~qsec, ~vs, ~am, ~gear, ~carb, ~date,
@@ -134,21 +141,48 @@ test_that("extract_md_tables can read multiple messy markdown tables from new fi
 
 test_that("extract_md_tables handles alignment separators", {
   md_file <- test_path("testmd", "aligned.md")
-  md <- extract_md_tables(md_file, show_col_types = FALSE)
-  expect_identical(test_tibble_1, md)
+  md <- suppressWarnings(extract_md_tables(md_file, show_col_types = FALSE))
+  expect_length(md, 1)
+  expect_true(inherits(md, "list"))
+  expect_named(md, "table_1")
+  expect_identical(test_tibble_1, md[[1]])
+  expect_identical(test_tibble_1, md[["table_1"]])
 })
 
 
 test_that("extract_md_tables can handle complicated Terraform READMEs", {
   md_file <- test_path("testmd", "gke-terraform.md")
-  md <- extract_md_tables(md_file, show_col_types = FALSE)
-  expect_identical(tf_tibble_1, md[[1]])
-  expect_identical(tf_tibble_2, md[[2]])
-  expect_identical(tf_tibble_3, md[[3]])
+  md <- suppressWarnings(extract_md_tables(md_file, show_col_types = FALSE))
+  expect_named(md, paste0("table_", 1:3))
+  expect_identical(tf_tibble_1, md[["table_1"]])
+  expect_identical(tf_tibble_2, md[["table_2"]])
+  expect_identical(tf_tibble_3, md[["table_3"]])
 })
 
 
-test_that("extract_md_tables aborts when no tables are found", {
+test_that("extract_md_tables returns NULL when no tables are found", {
   md_file <- test_path("testmd", "no-table.md")
-  expect_error(extract_md_tables(md_file, show_col_types = FALSE))
+  expect_null(
+    suppressWarnings(extract_md_tables(md_file, warn = FALSE, show_col_types = FALSE))
+  )
+})
+
+
+test_that("extract_md_tables and extract_md_table emit deprecation warnings", {
+  md_file <- test_path("testmd", "simple.md")
+  expect_warning(
+    extract_md_tables(md_file, show_col_types = FALSE),
+    class = "lifecycle_warning_deprecated"
+  )
+  expect_warning(
+    extract_md_table(md_file, show_col_types = FALSE),
+    class = "lifecycle_warning_deprecated"
+  )
+})
+
+test_that("extract_md_tables and extract_md_table return same result as read_md_table", {
+  md_file <- test_path("testmd", "simple.md")
+  expected <- read_md_table(md_file, show_col_types = FALSE)
+  expect_identical(expected, suppressWarnings(extract_md_tables(md_file, show_col_types = FALSE)))
+  expect_identical(expected, suppressWarnings(extract_md_table(md_file, show_col_types = FALSE)))
 })
